@@ -18,15 +18,15 @@
       <v-spacer></v-spacer>
       <div v-if="item.quantity == 0">
         <v-btn fab dark small color="primary">
-          <v-icon>mdi-cart-plus</v-icon>
+          <v-icon @click="item.quantity++">mdi-cart-plus</v-icon>
         </v-btn>
       </div>
       <div v-else>
-        <v-btn icon>
-          <v-icon>mdi-minus-circle-outline</v-icon>
+        <v-btn class="mx-2" fab dark small color="secondary">
+          <v-icon @click="item.quantity--">mdi-minus</v-icon>
         </v-btn>
-        <v-btn icon>
-          <v-icon>mdi-plus-circle</v-icon>
+        <v-btn fab dark small color="primary">
+          <v-icon @click="item.quantity++">mdi-plus</v-icon>
         </v-btn>
       </div>
     </v-card-actions>
