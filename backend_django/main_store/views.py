@@ -13,10 +13,8 @@ from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .serializers import *
 
-# Create your views here.
-@api_view(["GET", "POST", "DELETE"])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+
+@api_view(["GET"])
 def item_listing(request):
     if request.method == "GET":
         id = request.query_params.get("id", None)
@@ -28,12 +26,17 @@ def item_listing(request):
         serializer = ItemListingSerializer(item_listings, many=True)
         return JsonResponse({"data": serializer.data})
 
+
+@api_view(["POST", "DELETE"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def item_modify(request):
     # For both creating and modifying
-    elif request.method == "POST":
+    if request.method == "POST":
         data = JSONParser().parse(request)
         if "id" in data:
             id = data["id"]
-            item_listing = ItemListing.objects.get(id=id)
+            item_listing = get_object_or_404(ItemListing, id=id)
             serializer = ItemListingSerializer(item_listing, data=data)
             statuscode = 200
         else:
