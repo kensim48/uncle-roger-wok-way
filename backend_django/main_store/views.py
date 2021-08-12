@@ -1,13 +1,22 @@
 from re import T
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
-from rest_framework.decorators import api_view
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.parsers import JSONParser
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 from .models import *
 from .serializers import *
 
 # Create your views here.
 @api_view(["GET", "POST", "DELETE"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
 def item_listing(request):
     if request.method == "GET":
         id = request.query_params.get("id", None)
@@ -18,7 +27,7 @@ def item_listing(request):
             return JsonResponse({}, status=404)
         serializer = ItemListingSerializer(item_listings, many=True)
         return JsonResponse({"data": serializer.data})
-    
+
     # For both creating and modifying
     elif request.method == "POST":
         data = JSONParser().parse(request)
