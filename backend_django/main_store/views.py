@@ -1,13 +1,13 @@
 from re import T
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from .models import *
 from .serializers import *
 
 # Create your views here.
-@api_view(["GET", "POST"])
+@api_view(["GET", "POST", "DELETE"])
 def item_listing(request):
     if request.method == "GET":
         id = request.query_params.get("id", None)
@@ -34,3 +34,13 @@ def item_listing(request):
             serializer.save()
             return JsonResponse(serializer.data, status=statuscode)
         return JsonResponse(serializer.errors, status=400)
+
+    elif request.method == "DELETE":
+        data = JSONParser().parse(request)
+        if "id" in data:
+            id = data["id"]
+            item_listing = get_object_or_404(ItemListing, id=id)
+            if item_listing is not None:
+                item_listing.delete()
+                return JsonResponse({}, status=200)
+        return JsonResponse({}, status=400)
