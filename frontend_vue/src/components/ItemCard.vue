@@ -32,25 +32,27 @@
           </v-btn>
         </div>
         <v-spacer></v-spacer>
-        <div v-if="item.quantity == 0">
-          <v-btn fab dark small color="primary" @click="item.quantity++">
-            <v-icon>mdi-cart-plus</v-icon>
-          </v-btn>
-        </div>
-        <div v-else>
-          <v-btn
-            class="mx-2"
-            fab
-            dark
-            small
-            color="secondary"
-            @click="item.quantity--"
-          >
-            <v-icon>mdi-minus</v-icon>
-          </v-btn>
-          <v-btn fab dark small color="primary" @click="item.quantity++">
-            <v-icon>mdi-plus</v-icon>
-          </v-btn>
+        <div v-if="loggedIn">
+          <div v-if="item.quantity == 0">
+            <v-btn fab dark small color="primary" @click="item.quantity++">
+              <v-icon>mdi-cart-plus</v-icon>
+            </v-btn>
+          </div>
+          <div v-else>
+            <v-btn
+              class="mx-2"
+              fab
+              dark
+              small
+              color="secondary"
+              @click="item.quantity--"
+            >
+              <v-icon>mdi-minus</v-icon>
+            </v-btn>
+            <v-btn fab dark small color="primary" @click="item.quantity++">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </div>
         </div>
       </v-card-actions>
     </v-card>
@@ -66,6 +68,7 @@ export default {
   props: {
     item: Object,
     isStaff: Boolean,
+    loggedIn: Boolean,
   },
   methods: {
     emitOpenEditEvent() {

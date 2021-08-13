@@ -3,6 +3,50 @@
     <v-dialog v-model="modifyDialog" max-width="600px" persistent>
       <ModifyItem :item="selectedItem" />
     </v-dialog>
+    <v-dialog v-model="checkoutDialog" max-width="600px" persistent>
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Checkout</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container
+            v-if="checkingoutItems.length > 0"
+            class="grey lighten-5"
+          >
+            <v-row>
+              <v-col>Name</v-col>
+              <v-col>Price</v-col>
+              <v-col>Quantity</v-col>
+              <v-col>Total</v-col>
+            </v-row>
+            <v-row
+              v-for="checkingoutItem in checkingoutItems"
+              :key="checkingoutItem.id"
+            >
+              <v-col>{{ checkingoutItem.name }}</v-col>
+              <v-col>{{ checkingoutItem.price }}</v-col>
+              <v-col>{{ checkingoutItem.quantity }}</v-col>
+              <v-col>{{
+                checkingoutItem.price * checkingoutItem.quantity
+              }}</v-col>
+            </v-row>
+            <v-row>
+              <v-col></v-col>
+              <v-col></v-col>
+              <v-col>Final Total:</v-col>
+              <v-col>{{ checkingoutPrice }}</v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="checkoutDialog = false">
+            Close
+          </v-btn>
+          <v-btn color="primary" text @click="submitOrder()"> Submit </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="deleteDialog" max-width="600px" persistent>
       <v-card>
         <v-card-title>
@@ -101,7 +145,13 @@
 
       <v-spacer></v-spacer>
       <div v-if="loggedIn">
-        <v-btn class="ma-2" @click="handleLogout()">Logout</v-btn>
+        <v-btn class="ma-2" @click="checkOutDialogActivate()">
+          Checkout
+          <v-icon right dark> mdi-cart </v-icon>
+        </v-btn>
+        <v-btn class="ma-2" color="secondary" @click="handleLogout()"
+          >Logout</v-btn
+        >
       </div>
       <div v-else>
         <v-btn class="ma-2" @click="registerDialog = true">Register</v-btn>
@@ -144,6 +194,7 @@
             <ItemCard
               :item="item"
               :isStaff="isStaff"
+              :loggedIn="loggedIn"
               :selectedItem="selectedItem"
               :modifyDialog="modifyDialog"
             />
@@ -159,6 +210,9 @@
     </v-snackbar>
     <v-snackbar v-model="registrationSnackbar" color="green">
       Successfully registered
+    </v-snackbar>
+    <v-snackbar v-model="orderSnackbar" color="green">
+      Order Submitted
     </v-snackbar>
     <v-snackbar v-model="errorSnackbar" color="red">
       {{ errorMessage }}
@@ -184,15 +238,19 @@ export default {
     loginSnackbar: false,
     logoutSnackbar: false,
     registrationSnackbar: false,
+    orderSnackbar: false,
     errorSnackbar: false,
     errorMessage: "",
     loginDialog: false,
     registerDialog: false,
     modifyDialog: false,
     deleteDialog: false,
+    checkoutDialog: false,
     isStaff: false,
     itemLoading: true,
     items: [],
+    checkingoutItems: [],
+    checkingoutPrice: 0,
     selectedItem: {},
   }),
   computed: {
@@ -227,6 +285,18 @@ export default {
       this.deleteDialog = false;
       this.selectedItem = {};
     },
+    checkOutDialogActivate() {
+      this.checkingoutItems = [];
+      this.checkingoutPrice = 0;
+      for (var item of this.items) {
+        if (item["quantity"] != 0) {
+          this.checkingoutItems.push(item);
+          console.log(this.checkingoutItems);
+          this.checkingoutPrice += item.price * item.quantity;
+        }
+      }
+      this.checkoutDialog = true;
+    },
     submitDeleteItem() {
       UserService.deleteItemModify(this.selectedItem).then(
         () => {
@@ -252,6 +322,26 @@ export default {
           }
           this.items = response.data.data;
           this.itemLoading = false;
+        },
+        (error) => {
+          this.content =
+            (error.response && error.response.data) ||
+            error.message ||
+            error.toString();
+          this.errorMessage = error.response.data;
+          this.errorSnackbar = true;
+          this.itemLoading = false;
+        }
+      );
+    },
+    submitOrder() {
+      this.checkoutDialog = false;
+      UserService.postOrder({ data: this.checkingoutItems }).then(
+        () => {
+          this.orderSnackbar = true;
+          for (var item of this.items) {
+            item["quantity"] = 0;
+          }
         },
         (error) => {
           this.content =
