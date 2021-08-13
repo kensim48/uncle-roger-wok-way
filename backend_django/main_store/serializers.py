@@ -8,7 +8,8 @@ class ItemListingSerializer(serializers.ModelSerializer):
         model = ItemListing
         fields = "__all__"
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username', 'email', 'is_staff']
+        fields = ["username", "email", "is_staff"]

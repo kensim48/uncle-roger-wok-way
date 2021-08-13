@@ -1,3 +1,4 @@
+import enum
 from re import T
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -59,6 +60,28 @@ def item_modify(request):
                 item_listing.delete()
                 return JsonResponse({}, status=200)
         return JsonResponse({}, status=400)
+
+
+@api_view(["POST"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def send_order(request):
+    if request.method == "POST":
+        order_items_dict = JSONParser().parse(request)["data"]
+        order_item_ids = [x["id"] for x in order_items_dict]
+        items = ItemListing.objects.filter(id__in=order_item_ids)
+        order_items = []
+        for count, item in enumerate(items):
+            order_items.append(
+                OrderItem(item=item, quantity=order_items_dict[count]["quantity"])
+            )
+        OrderItem.objects.bulk_create(order_items)
+        order = Order(user=request.user)
+        order.save()
+        order.items.add(*order_items)
+        order.save()
+        return JsonResponse({}, status=200)
+
 
 @api_view(["GET"])
 @authentication_classes([JWTAuthentication])

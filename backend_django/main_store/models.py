@@ -11,9 +11,11 @@ class ItemListing(models.Model):
         return self.name
 
 
-class ExtendUser(models.Model):
-    r = models.OneToOneField(User, on_delete=models.CASCADE)
-    is_admin = models.BooleanField(default=False)
+class OrderItem(models.Model):
+    item = models.ForeignKey(ItemListing, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
 
-    def __str__(self):
-        return self.r.username
+
+class Order(models.Model):
+    items = models.ManyToManyField(OrderItem)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
