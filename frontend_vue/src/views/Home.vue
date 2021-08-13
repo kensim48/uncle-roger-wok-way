@@ -190,7 +190,7 @@
           </v-col>
         </v-row>
         <v-row v-else>
-          <v-col v-for="item in items" :key="item.id" cols="4">
+          <v-col v-for="item in items" :key="item.id" cols="3">
             <ItemCard
               :item="item"
               :isStaff="isStaff"

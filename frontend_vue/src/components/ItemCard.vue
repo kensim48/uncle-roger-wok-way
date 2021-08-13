@@ -1,12 +1,12 @@
 <template>
   <div>
     <v-card>
-      <v-img
+      <!-- <v-img
         class="white--text align-end"
         gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
         height="200px"
       >
-      </v-img>
+      </v-img> -->
       <v-card-title>
         {{ item.name }}
       </v-card-title>
