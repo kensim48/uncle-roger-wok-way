@@ -66,7 +66,7 @@
           </v-col>
         </v-row>
         <v-row>
-          <v-col v-for="n in 24" :key="n" cols="4">
+          <v-col v-for="item in items" :key="item.id" cols="4">
             <ItemCard :item="item" />
           </v-col>
         </v-row>
@@ -96,11 +96,12 @@ export default {
     loginSnackbar: false,
     logoutSnackbar: false,
     loginDialog: false,
-    item: {
-      name: "hello",
-      price: 4,
-      quantity: 0,
-    },
+    items: [],
+    // item: {
+    //   name: "hello",
+    //   price: 4,
+    //   quantity: 0,
+    // },
   }),
   computed: {
     loggedIn() {
@@ -108,12 +109,29 @@ export default {
     },
   },
   created() {
+    this.getItemList();
     if (this.loggedIn) {
       console.log("logged in");
       this.getUserDetails();
     }
   },
   methods: {
+    getItemList() {
+      UserService.getItemList().then(
+        (response) => {
+          for (var item of response.data.data) {
+            item["quantity"] = 0;
+          }
+          this.items = response.data.data;
+        },
+        (error) => {
+          this.content =
+            (error.response && error.response.data) ||
+            error.message ||
+            error.toString();
+        }
+      );
+    },
     handleLogin() {
       this.loading = true;
       if (this.user.username && this.user.password) {
