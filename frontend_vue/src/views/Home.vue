@@ -1,5 +1,8 @@
 <template>
   <v-app id="inspire">
+    <v-dialog v-model="modifyDialog" max-width="600px" persistent>
+      <ModifyItem :item="selectedItem" />
+    </v-dialog>
     <v-dialog v-model="loginDialog" max-width="600px">
       <v-card>
         <v-card-title>
@@ -61,13 +64,23 @@
           height="200"
         />
         <v-row>
-          <v-col>
+          <v-col cols="10">
             <div>Top Products</div>
+          </v-col>
+          <v-col cols="2" v-if="loggedIn">
+            <v-btn class="ma-2" color="primary" @click="modifyDialog = true"
+              >New Item</v-btn
+            >
           </v-col>
         </v-row>
         <v-row>
           <v-col v-for="item in items" :key="item.id" cols="4">
-            <ItemCard :item="item" />
+            <ItemCard
+              :item="item"
+              :loggedIn="loggedIn"
+              :selectedItem="selectedItem"
+              :modifyDialog="modifyDialog"
+            />
           </v-col>
         </v-row>
       </v-container>
@@ -83,12 +96,15 @@
 
 <script>
 import ItemCard from "../components/ItemCard.vue";
+import ModifyItem from "../components/ModifyItem.vue";
 import User from "../models/user";
 import UserService from "../services/user.service";
+import { EventBus } from "@/event-bus";
 
 export default {
   components: {
     ItemCard,
+    ModifyItem,
   },
   data: () => ({
     user: new User("", ""),
@@ -96,12 +112,9 @@ export default {
     loginSnackbar: false,
     logoutSnackbar: false,
     loginDialog: false,
+    modifyDialog: false,
     items: [],
-    // item: {
-    //   name: "hello",
-    //   price: 4,
-    //   quantity: 0,
-    // },
+    selectedItem: {},
   }),
   computed: {
     loggedIn() {
@@ -114,6 +127,14 @@ export default {
       console.log("logged in");
       this.getUserDetails();
     }
+    EventBus.$on("openEdit", (data) => {
+      this.modifyDialog = true;
+      this.selectedItem = data;
+    });
+    EventBus.$on("closeEdit", () => {
+      this.modifyDialog = false;
+      this.selectedItem = {};
+    });
   },
   methods: {
     getItemList() {
@@ -154,7 +175,6 @@ export default {
       }
     },
     handleLogout() {
-      console.log("tun");
       this.loading = true;
       this.$store.dispatch("auth/logout").then(
         () => {
@@ -173,11 +193,8 @@ export default {
         (response) => {
           this.username = response.data.username;
         },
-        (error) => {
-          this.content =
-            (error.response && error.response.data) ||
-            error.message ||
-            error.toString();
+        () => {
+          this.handleLogout();
         }
       );
     },
