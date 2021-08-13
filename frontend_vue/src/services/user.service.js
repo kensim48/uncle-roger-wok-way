@@ -9,7 +9,7 @@ class UserService {
   }
 
   getUserDetails() {
-    return axios.get(API_URL + "auth/users/me/", { headers: authHeader() });
+    return axios.get(API_URL + "api/whoami/", { headers: authHeader() });
   }
 
   postItemModify(data) {

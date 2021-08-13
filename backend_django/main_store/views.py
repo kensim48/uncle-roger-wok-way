@@ -56,3 +56,41 @@ def item_modify(request):
                 item_listing.delete()
                 return JsonResponse({}, status=200)
         return JsonResponse({}, status=400)
+
+@api_view(["POST", "DELETE"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def item_modify(request):
+    # For both creating and modifying
+    if request.method == "POST":
+        data = JSONParser().parse(request)
+        if "id" in data:
+            id = data["id"]
+            item_listing = get_object_or_404(ItemListing, id=id)
+            serializer = ItemListingSerializer(item_listing, data=data)
+            statuscode = 200
+        else:
+            serializer = ItemListingSerializer(data=data)
+            statuscode = 201
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=statuscode)
+        return JsonResponse(serializer.errors, status=400)
+
+    elif request.method == "DELETE":
+        data = JSONParser().parse(request)
+        if "id" in data:
+            id = data["id"]
+            item_listing = get_object_or_404(ItemListing, id=id)
+            if item_listing is not None:
+                item_listing.delete()
+                return JsonResponse({}, status=200)
+        return JsonResponse({}, status=400)
+
+@api_view(["GET"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def whoami(request):
+    if request.method == "GET":
+        serializer = UserSerializer(request.user, many=False)
+        return JsonResponse(serializer.data)

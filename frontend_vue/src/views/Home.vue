@@ -55,13 +55,13 @@
       </v-card>
     </v-dialog>
     <v-app-bar app color="primary">
-      <v-toolbar-title v-if="loggedIn"
+      <v-toolbar-title v-if="isStaff"
         >Welcome back, {{ username }}</v-toolbar-title
       >
       <v-toolbar-title v-else>Wok Way</v-toolbar-title>
 
       <v-spacer></v-spacer>
-      <div v-if="loggedIn">
+      <div v-if="isStaff">
         <v-btn class="ma-2" @click="handleLogout()">Logout</v-btn>
       </div>
       <div v-else>
@@ -84,7 +84,7 @@
           <v-col cols="10">
             <div>Top Products</div>
           </v-col>
-          <v-col cols="2" v-if="loggedIn">
+          <v-col cols="2" v-if="isStaff">
             <v-btn class="ma-2" color="primary" @click="modifyDialog = true"
               >New Item</v-btn
             >
@@ -104,7 +104,7 @@
           <v-col v-for="item in items" :key="item.id" cols="4">
             <ItemCard
               :item="item"
-              :loggedIn="loggedIn"
+              :isStaff="isStaff"
               :selectedItem="selectedItem"
               :modifyDialog="modifyDialog"
             />
@@ -141,6 +141,7 @@ export default {
     loginDialog: false,
     modifyDialog: false,
     deleteDialog: false,
+    isStaff: false,
     itemLoading: true,
     items: [],
     selectedItem: {},
@@ -236,6 +237,7 @@ export default {
       this.$store.dispatch("auth/logout").then(
         () => {
           this.logoutSnackbar = true;
+          this.isStaff = false;
         },
         (error) => {
           this.message =
@@ -249,6 +251,7 @@ export default {
       UserService.getUserDetails().then(
         (response) => {
           this.username = response.data.username;
+          this.isStaff = response.data.is_staff;
         },
         () => {
           this.handleLogout();

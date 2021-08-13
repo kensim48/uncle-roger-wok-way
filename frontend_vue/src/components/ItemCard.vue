@@ -16,7 +16,7 @@
         <div class="ml-3" v-if="item.quantity != 0">
           {{ item.quantity }} in cart
         </div>
-        <div v-if="loggedIn">
+        <div v-if="isStaff">
           <v-btn fab dark small color="highlight" @click="emitOpenEditEvent()">
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
@@ -65,7 +65,7 @@ export default {
   data: () => ({}),
   props: {
     item: Object,
-    loggedIn: Boolean,
+    isStaff: Boolean,
   },
   methods: {
     emitOpenEditEvent() {
