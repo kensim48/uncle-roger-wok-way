@@ -27,14 +27,14 @@
               <v-col>{{ checkingoutItem.price }}</v-col>
               <v-col>{{ checkingoutItem.quantity }}</v-col>
               <v-col>{{
-                checkingoutItem.price * checkingoutItem.quantity
+                (checkingoutItem.price * checkingoutItem.quantity).toFixed(2)
               }}</v-col>
             </v-row>
             <v-row>
               <v-col></v-col>
               <v-col></v-col>
               <v-col>Final Total:</v-col>
-              <v-col>{{ checkingoutPrice }}</v-col>
+              <v-col>{{ checkingoutPrice.toFixed(2) }}</v-col>
             </v-row>
           </v-container>
         </v-card-text>
@@ -145,7 +145,11 @@
 
       <v-spacer></v-spacer>
       <div v-if="loggedIn">
-        <v-btn class="ma-2" @click="checkOutDialogActivate()">
+        <v-btn
+          class="ma-2"
+          @click="checkOutDialogActivate()"
+          :disabled="!canCheckout"
+        >
           Checkout
           <v-icon right dark> mdi-cart </v-icon>
         </v-btn>
@@ -257,11 +261,18 @@ export default {
     loggedIn() {
       return this.$store.state.auth.status.loggedIn;
     },
+    canCheckout() {
+      for (var item of this.items) {
+        if (item["quantity"] != 0) {
+          return true;
+        }
+      }
+      return false;
+    },
   },
   created() {
     this.getItemList();
     if (this.loggedIn) {
-      console.log("logged in");
       this.getUserDetails();
     }
     EventBus.$on("openEdit", (data) => {
@@ -291,7 +302,6 @@ export default {
       for (var item of this.items) {
         if (item["quantity"] != 0) {
           this.checkingoutItems.push(item);
-          console.log(this.checkingoutItems);
           this.checkingoutPrice += item.price * item.quantity;
         }
       }
@@ -357,7 +367,6 @@ export default {
     handleRegister() {
       this.loading = true;
       if (this.user.username && this.user.password) {
-        console.log(this.user);
         this.$store.dispatch("auth/register", this.user).then(
           () => {
             this.registerDialog = false;
@@ -379,7 +388,6 @@ export default {
     handleLogin() {
       this.loading = true;
       if (this.user.username && this.user.password) {
-        console.log(this.user);
         this.$store.dispatch("auth/login", this.user).then(
           () => {
             this.getUserDetails();
