@@ -35,13 +35,14 @@
       <v-btn color="secondary" text @click="emitCloseEditEvent()">
         Close
       </v-btn>
-      <v-btn color="primary" text> Submit </v-btn>
+      <v-btn color="primary" text @click="submitItem()"> Submit </v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
 import { EventBus } from "@/event-bus";
+import UserService from "../services/user.service";
 
 export default {
   props: {
@@ -50,6 +51,19 @@ export default {
   methods: {
     emitCloseEditEvent() {
       EventBus.$emit("closeEdit");
+    },
+    submitItem() {
+      UserService.postItemModify(this.item).then(
+        () => {
+          this.emitCloseEditEvent();
+        },
+        (error) => {
+          this.content =
+            (error.response && error.response.data) ||
+            error.message ||
+            error.toString();
+        }
+      );
     },
   },
 };

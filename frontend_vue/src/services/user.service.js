@@ -12,12 +12,10 @@ class UserService {
     return axios.get(API_URL + "auth/users/me/", { headers: authHeader() });
   }
 
-  postItemList(data) {
-    return axios.post(
-      API_URL + "api/item_listing/",
-      { headers: authHeader() },
-      data
-    );
+  postItemModify(data) {
+    return axios.post(API_URL + "api/item_modify/", data, {
+      headers: authHeader(),
+    });
   }
 
   getAdminBoard() {

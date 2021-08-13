@@ -61,7 +61,6 @@ export default {
   props: {
     item: Object,
     loggedIn: Boolean,
-    selectedItem: Object,
   },
   methods: {
     emitOpenEditEvent() {
