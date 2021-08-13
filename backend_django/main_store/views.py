@@ -18,7 +18,7 @@ from .serializers import *
 @api_view(["GET"])
 def item_listing(request):
     if request.method == "GET":
-        id = request.query_params.get("id", None)
+        id = request.query_params.get("item_id", None)
         item_listings = ItemListing.objects.all()
         if id is not None:
             item_listings = item_listings.filter(id=id)
@@ -81,6 +81,28 @@ def send_order(request):
         order.items.add(*order_items)
         order.save()
         return JsonResponse({}, status=200)
+
+
+@api_view(["GET"])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def view_order(request):
+    if request.method == "GET":
+        # Only for staff
+        if not request.user.is_staff:
+            return JsonResponse({}, status=403)
+        orders = Order.objects.all()
+        user_id = request.query_params.get("user_id", None)
+        if user_id is not None:
+            orders = orders.filter(user__id=user_id)
+        # Booking id
+        id = request.query_params.get("booking_id", None)
+        if id is not None:
+            orders = orders.filter(id=id)
+        if len(orders) == 0:
+            return JsonResponse({}, status=404)
+        serializer = OrderSerializer(orders, many=True)
+        return JsonResponse({"data": serializer.data}, status=200)
 
 
 @api_view(["GET"])
