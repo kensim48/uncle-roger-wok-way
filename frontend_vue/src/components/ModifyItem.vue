@@ -56,6 +56,7 @@ export default {
       UserService.postItemModify(this.item).then(
         () => {
           this.emitCloseEditEvent();
+          EventBus.$emit("refreshList");
         },
         (error) => {
           this.content =

@@ -3,6 +3,23 @@
     <v-dialog v-model="modifyDialog" max-width="600px" persistent>
       <ModifyItem :item="selectedItem" />
     </v-dialog>
+    <v-dialog v-model="deleteDialog" max-width="600px" persistent>
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Delete item</span>
+        </v-card-title>
+        <v-card-text>
+          Are you sure you want to delete {{ selectedItem.name }}?
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="closeDeleteDialog()">
+            No
+          </v-btn>
+          <v-btn color="primary" text @click="submitDeleteItem()"> Yes </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="loginDialog" max-width="600px">
       <v-card>
         <v-card-title>
@@ -73,7 +90,17 @@
             >
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="itemLoading">
+          <v-col align="center" justify="center">
+            <v-progress-circular
+              :size="200"
+              :width="15"
+              color="primary"
+              indeterminate
+            ></v-progress-circular>
+          </v-col>
+        </v-row>
+        <v-row v-else>
           <v-col v-for="item in items" :key="item.id" cols="4">
             <ItemCard
               :item="item"
@@ -113,6 +140,8 @@ export default {
     logoutSnackbar: false,
     loginDialog: false,
     modifyDialog: false,
+    deleteDialog: false,
+    itemLoading: true,
     items: [],
     selectedItem: {},
   }),
@@ -135,21 +164,49 @@ export default {
       this.modifyDialog = false;
       this.selectedItem = {};
     });
+    EventBus.$on("refreshList", () => {
+      this.getItemList();
+    });
+    EventBus.$on("openDelete", (data) => {
+      this.deleteDialog = true;
+      this.selectedItem = data;
+    });
   },
   methods: {
-    getItemList() {
-      UserService.getItemList().then(
-        (response) => {
-          for (var item of response.data.data) {
-            item["quantity"] = 0;
-          }
-          this.items = response.data.data;
+    closeDeleteDialog() {
+      this.deleteDialog = false;
+      this.selectedItem = {};
+    },
+    submitDeleteItem() {
+      UserService.deleteItemModify(this.selectedItem).then(
+        () => {
+          this.closeDeleteDialog();
+          EventBus.$emit("refreshList");
         },
         (error) => {
           this.content =
             (error.response && error.response.data) ||
             error.message ||
             error.toString();
+        }
+      );
+    },
+    getItemList() {
+      this.itemLoading = true;
+      UserService.getItemList().then(
+        (response) => {
+          for (var item of response.data.data) {
+            item["quantity"] = 0;
+          }
+          this.items = response.data.data;
+          this.itemLoading = false;
+        },
+        (error) => {
+          this.content =
+            (error.response && error.response.data) ||
+            error.message ||
+            error.toString();
+          this.itemLoading = false;
         }
       );
     },

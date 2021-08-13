@@ -16,16 +16,21 @@
         <div class="ml-3" v-if="item.quantity != 0">
           {{ item.quantity }} in cart
         </div>
-        <v-btn
-          v-if="loggedIn"
-          fab
-          dark
-          small
-          color="highlight"
-          @click="emitOpenEditEvent()"
-        >
-          <v-icon>mdi-pencil</v-icon>
-        </v-btn>
+        <div v-if="loggedIn">
+          <v-btn fab dark small color="highlight" @click="emitOpenEditEvent()">
+            <v-icon>mdi-pencil</v-icon>
+          </v-btn>
+          <v-btn
+            class="mx-2"
+            fab
+            dark
+            small
+            color="red"
+            @click="emitOpenDeleteEvent()"
+          >
+            <v-icon>mdi-trash-can</v-icon>
+          </v-btn>
+        </div>
         <v-spacer></v-spacer>
         <div v-if="item.quantity == 0">
           <v-btn fab dark small color="primary" @click="item.quantity++">
@@ -65,6 +70,9 @@ export default {
   methods: {
     emitOpenEditEvent() {
       EventBus.$emit("openEdit", this.item);
+    },
+    emitOpenDeleteEvent() {
+      EventBus.$emit("openDelete", this.item);
     },
   },
 };

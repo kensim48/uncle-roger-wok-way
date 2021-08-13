@@ -15,6 +15,14 @@ class UserService {
   postItemModify(data) {
     return axios.post(API_URL + "api/item_modify/", data, {
       headers: authHeader(),
+      data: data,
+    });
+  }
+
+  deleteItemModify(data) {
+    return axios.delete(API_URL + "api/item_modify/", {
+      data: data,
+      headers: authHeader(),
     });
   }
 
