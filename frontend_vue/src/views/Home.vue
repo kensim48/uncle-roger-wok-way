@@ -20,6 +20,45 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="registerDialog" max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Registration</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field label="Username" required v-model="user.username"
+                  ><v-icon slot="prepend">mdi-account</v-icon></v-text-field
+                >
+              </v-col>
+              <v-col cols="12">
+                <v-text-field label="Email" required v-model="user.email"
+                  ><v-icon slot="prepend">mdi-email</v-icon></v-text-field
+                >
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  label="Password"
+                  type="password"
+                  required
+                  v-model="user.password"
+                  ><v-icon slot="prepend">mdi-key</v-icon></v-text-field
+                >
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="secondary" text @click="registerDialog = false">
+            Close
+          </v-btn>
+          <v-btn color="primary" text @click="handleRegister()"> Submit </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="loginDialog" max-width="600px">
       <v-card>
         <v-card-title>
@@ -55,17 +94,17 @@
       </v-card>
     </v-dialog>
     <v-app-bar app color="primary">
-      <v-toolbar-title v-if="isStaff"
+      <v-toolbar-title v-if="loggedIn"
         >Welcome back, {{ username }}</v-toolbar-title
       >
       <v-toolbar-title v-else>Wok Way</v-toolbar-title>
 
       <v-spacer></v-spacer>
-      <div v-if="isStaff">
+      <div v-if="loggedIn">
         <v-btn class="ma-2" @click="handleLogout()">Logout</v-btn>
       </div>
       <div v-else>
-        <v-btn class="ma-2">Register</v-btn>
+        <v-btn class="ma-2" @click="registerDialog = true">Register</v-btn>
         <v-btn class="ma-2" color="secondary" @click="loginDialog = true">
           Login
         </v-btn>
@@ -118,6 +157,12 @@
     <v-snackbar v-model="logoutSnackbar" color="green">
       Successfully logged out
     </v-snackbar>
+    <v-snackbar v-model="registrationSnackbar" color="green">
+      Successfully registered
+    </v-snackbar>
+    <v-snackbar v-model="errorSnackbar" color="red">
+      {{ errorMessage }}
+    </v-snackbar>
   </v-app>
 </template>
 
@@ -138,7 +183,11 @@ export default {
     username: "",
     loginSnackbar: false,
     logoutSnackbar: false,
+    registrationSnackbar: false,
+    errorSnackbar: false,
+    errorMessage: "",
     loginDialog: false,
+    registerDialog: false,
     modifyDialog: false,
     deleteDialog: false,
     isStaff: false,
@@ -189,6 +238,8 @@ export default {
             (error.response && error.response.data) ||
             error.message ||
             error.toString();
+          this.errorMessage = error.response.data;
+          this.errorSnackbar = true;
         }
       );
     },
@@ -207,9 +258,33 @@ export default {
             (error.response && error.response.data) ||
             error.message ||
             error.toString();
+          this.errorMessage = error.response.data;
+          this.errorSnackbar = true;
           this.itemLoading = false;
         }
       );
+    },
+    handleRegister() {
+      this.loading = true;
+      if (this.user.username && this.user.password) {
+        console.log(this.user);
+        this.$store.dispatch("auth/register", this.user).then(
+          () => {
+            this.registerDialog = false;
+            this.user = new User("", "");
+            this.registrationSnackbar = true;
+          },
+          (error) => {
+            this.loading = false;
+            this.message =
+              (error.response && error.response.data) ||
+              error.message ||
+              error.toString();
+            this.errorMessage = error.response.data;
+            this.errorSnackbar = true;
+          }
+        );
+      }
     },
     handleLogin() {
       this.loading = true;
@@ -228,6 +303,8 @@ export default {
               (error.response && error.response.data) ||
               error.message ||
               error.toString();
+            this.errorMessage = error.response.data;
+            this.errorSnackbar = true;
           }
         );
       }

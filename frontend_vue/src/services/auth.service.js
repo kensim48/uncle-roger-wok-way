@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8000/auth/jwt/";
+const API_URL = "http://localhost:8000/auth/";
 
 class AuthService {
   login(user) {
     return axios
-      .post(API_URL + "create/", {
+      .post(API_URL + "jwt/create/", {
         username: user.username,
         password: user.password,
       })
@@ -19,12 +19,11 @@ class AuthService {
   }
 
   logout() {
-    console.log("run");
     localStorage.removeItem("user");
   }
 
   register(user) {
-    return axios.post(API_URL + "signup", {
+    return axios.post(API_URL + "users/", {
       username: user.username,
       email: user.email,
       password: user.password,
