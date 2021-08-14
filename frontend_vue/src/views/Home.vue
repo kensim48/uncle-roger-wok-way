@@ -24,7 +24,7 @@
               :key="checkingoutItem.id"
             >
               <v-col>{{ checkingoutItem.name }}</v-col>
-              <v-col>{{ checkingoutItem.price }}</v-col>
+              <v-col>{{ checkingoutItem.price.toFixed(2) }}</v-col>
               <v-col>{{ checkingoutItem.quantity }}</v-col>
               <v-col>{{
                 (checkingoutItem.price * checkingoutItem.quantity).toFixed(2)
