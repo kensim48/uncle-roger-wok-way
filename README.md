@@ -80,3 +80,6 @@ Any user registered via the frontend, or registration endpoint is automatically 
 1. Some design decisions were made to assist with easy setup of MVP, i.e. database is in docker container and will be destroyed, sensitive info can be moved to environment variables for future use
 2. OAuth2 flow is not properly setup, and only uses Access Token for verification
 3. Made orders are only readable by staff and only through API query or admin portal
+
+## Attribution
+Wok icon made by [Freepik](https://www.freepik.com)
