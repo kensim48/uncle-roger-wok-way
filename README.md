@@ -2,13 +2,13 @@
 
 ## Prequisites
 ### For main application
-1. [Docker]: https://docs.docker.com/get-docker/
-2. [Docker Compose]: https://docs.docker.com/compose/
+1. [Docker](https://docs.docker.com/get-docker/)
+2. [Docker Compose](https://docs.docker.com/compose/)
 3. Ports 8000 and 8080 to be free
 
 ### For loading mock items
-1. [Python]: https://docs.python.org/
-2. [Python venv]: https://docs.python.org/3/library/venv.html
+1. [Python](https://docs.python.org/)
+2. [Python venv](https://docs.python.org/3/library/venv.html)
 ## Instructions to run
 ### Main app
 1. `docker-compose build`
@@ -59,10 +59,11 @@
 Frontend: http://localhost:8080/
 Backend: http://localhost:8000/admin
 ### Backend Documentation
-All interactions with the backend are provided in this [Postman Documentation]: https://documenter.getpostman.com/view/9432978/Tzz7Pxk9
+All interactions with the backend are provided in this [Postman Documentation](https://documenter.getpostman.com/view/9432978/Tzz7Pxk9)
 ### Accounts
 #### Default Account
 Username: admin
+
 Password: password
 
 #### Account types
