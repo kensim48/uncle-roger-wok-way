@@ -57,6 +57,7 @@
 ## Information
 ### Links
 Frontend: http://localhost:8080/
+
 Backend: http://localhost:8000/admin
 ### Backend Documentation
 All interactions with the backend are provided in this [Postman Documentation](https://documenter.getpostman.com/view/9432978/Tzz7Pxk9)
